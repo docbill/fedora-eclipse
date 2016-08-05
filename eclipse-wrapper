@@ -56,9 +56,21 @@ then
   fi
 fi
 # Hook to allow pre-installed software
-if [ -d /opt/eclipse.home -a ! -d "$HOME/.eclipse" ]
+if [ -d /opt/eclipse.home ]
 then
-  sudo -u "$XUSER" -g "$XGROUP" cp -r /opt/eclipse.home "$HOME/.eclipse"
+  firstTime=0
+  for i in "$HOME/.eclipse/"*
+  do
+    if [ $i != "$HOME/.eclipse/*" ]
+    then
+      firstTime=1
+    fi
+  done
+  if [ 0 -eq $firstTime ]
+  then
+     [ -d "$HOME/.eclipse" ] || mkdir -p "$HOME/.eclipse"
+     sudo -u "$XUSER" -g "$XGROUP" cp -r /opt/eclipse.home/. "$HOME/.eclipse/."
+  fi
 fi 
 exec sudo -u "$XUSER" -g "$XGROUP" /usr/bin/eclipse "$@"
 

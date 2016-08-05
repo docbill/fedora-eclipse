@@ -40,7 +40,7 @@ complicated such as:
 
 	xhost local:root
 	[ -n "$WORKSPACE" ] || WORKSPACE="$HOME/workspace"
-	[ -d "$WORKSPACE" ] || mkdir "$WORKSPACE"
+	[ -d "$WORKSPACE/.eclipse" ] || mkdir -p "$WORKSPACE/.eclipse"
 	docker run -i --net=host --rm --name docker-force -e DISPLAY -v /var/lib/sss:/var/lib/sss:ro -v "$HOME:$HOME" -v "$WORKSPACE/.eclipse:$HOME/.eclipse" -v /tmp:/tmp:z -v "$WORKSPACE:/workspace/:z" docbill/fedora-eclipse "$@"
 
 
