@@ -1,4 +1,4 @@
-# ubuntu-umake-eclipse
+# fedora-eclipse
 A docker container to eclipse in ubuntu with the specified workspace.
 
 ## Overview
@@ -21,14 +21,18 @@ If you have already have docker working you can start eclipse as easily as:
 	docker run -i --net=host --rm -e DISPLAY -v $HOME/workspace/:/workspace/:z docbill/fedora-eclipse
 
 
+## Windows Start
+
 For windows this was a bit more complicated.  I had to make sure Xwin (from
 cygwin) was started with the -listen tcp option, and that security was 
 disabled.  Once that was done the following command worked:
 
-	docker run -i --rm -e DISPLAY=172.31.253.119:0 -v /d/cygwin64/home/docbi/workspace/:/workspace/:z docbill/ubuntu-umake-eclipse
+	docker run -i --rm -e DISPLAY=172.31.253.119:0 -v /d/cygwin64/home/docbi/workspace/:/workspace/:z docbill/fedora-eclipse
 
 Where my ip address is 172.31.253.119, and the folder I wanted the workspace in
 was D:\cygwin64\home\docbi\workspace\
+
+## Running With Limited Access To Your Linux Desktop
 
 If you want to do something more advance such as granting eclipse access to
 the firefox browser on your desktop you'll need to do something more
@@ -39,6 +43,8 @@ complicated such as:
 	[ -d "$WORKSPACE" ] || mkdir "$WORKSPACE"
 	docker run -i --net=host --rm --name docker-force -e DISPLAY -v /var/lib/sss:/var/lib/sss:ro -v "$HOME:$HOME" -v "$WORKSPACE/.eclipse:$HOME/.eclipse" -v /tmp:/tmp:z -v "$WORKSPACE:/workspace/:z" docbill/fedora-eclipse "$@"
 
+
+## First Time Notes
 
 The first time you run this command it will download the image.
 
