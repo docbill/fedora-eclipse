@@ -17,8 +17,7 @@ then
 fi
 if [ -z "$DISPLAY" -o ! -d "$HOME" ]
 then
-  echo 'Usage: sudo docker run -ti --net=host --rm -e "DISPLAY=$DISPLAY" -v "$HOME/workspace/:/workspace/:z" docbill/fedora-eclipse' 2>&1
-  echo '-or-: sudo docker run -ti --net=host --rm -e DISPLAY -e HOME -v "$HOME/:$HOME/:z" docbill/fedora-eclipse' 2>&1
+  echo 'Usage: sudo docker run -ti --net=host --rm -e "DISPLAY=$DISPLAY" -v "$HOME/workspace/:$HOME:z" -v "$HOME/workspace/:/workspace/:z" docbill/fedora-eclipse' 2>&1
   exit 1
 fi
 cd "$HOME"
@@ -58,19 +57,15 @@ fi
 # Hook to allow pre-installed software
 if [ -d /opt/eclipse.home ]
 then
-  firstTime=0
-  for i in "$HOME/.eclipse/"*
-  do
-    if [ $i != "$HOME/.eclipse/*" ]
-    then
-      firstTime=1
-    fi
-  done
-  if [ 0 -eq $firstTime ]
-  then
-     [ -d "$HOME/.eclipse" ] || mkdir -p "$HOME/.eclipse"
-     sudo -u "$XUSER" -g "$XGROUP" cp -r /opt/eclipse.home/. "$HOME/.eclipse/."
-  fi
+  ( cd /opt/eclipse.home
+    for i in *.tar.bz2
+    do
+      if [ ! -d "$HOME/.${i%.tar.bz2}" -a -r "$i" ]
+      then
+        ( cd "$HOME" && tar xf "/opt/eclipse.home/$i" && chown -R  "$XUSER"."$XGROUP" ".${i%.tar.bz2}" )
+      fi
+    done
+  )
 fi 
 exec sudo -u "$XUSER" -g "$XGROUP" /usr/bin/eclipse "$@"
 
