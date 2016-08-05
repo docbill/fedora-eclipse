@@ -1,0 +1,64 @@
+#!/bin/bash -e
+if [ ! -O / ]
+then
+  /opt/eclipse/eclipse "$@"
+  exit $?
+fi
+if [ -z "$HOME" -o "$HOME" = "/root" ]
+then
+  if [ -z "$WORKSPACE" ]
+  then
+    export WORKSPACE=/workspace
+  fi
+  export HOME="$WORKSPACE"
+elif [ -z "$WORKSPACE" ]
+then
+  export WORKSPACE="$HOME/workspace"
+fi
+if [ -z "$DISPLAY" -o ! -d "$HOME" ]
+then
+  echo 'Usage: sudo docker run -ti --net=host --rm -e "DISPLAY=$DISPLAY" -v "$HOME/workspace/:/workspace/:z" docbill/fedora-eclipse' 2>&1
+  echo '-or-: sudo docker run -ti --net=host --rm -e DISPLAY -e HOME -v "$HOME/:$HOME/:z" docbill/fedora-eclipse' 2>&1
+  exit 1
+fi
+cd "$HOME"
+
+values=( $(stat -c '%g %u %U %G' "$HOME") )
+XGID=${values[0]}
+XUID=${values[1]}
+XUSER=${values[2]}
+XGROUP=${values[3]}
+if [ "$XGROUP" = "UNKNOWN" ]
+then
+  XGROUP="$XUSER"
+  if [ "$XUSER" = "UNKNOWN" ]
+  then
+    XGROUP=g$XGID
+  fi
+  if ! ( groupadd -f -g $XGID "$XGROUP" 2>>/dev/null )
+  then
+    XGROUP="#$XGID"
+  fi
+fi
+if [ "$XUSER" = "UNKNOWN" ]
+then
+  XUSER=$USER
+  if ! ( sed 's,^\(.\),^\1,' < /etc/passwd|fgrep -q "^$USER:$XUID:" ) 
+  then
+    if ( [ -z "$USER" -o "$USER" = "root" ] || sed 's,^\(.\),^\1,' < /etc/passwd|fgrep -q "^$USER:" ) 
+    then
+      XUSER=u$XUID
+    fi
+    if ! ( useradd -u $XUID -g "$XGROUP" -d "$HOME" "$XUSER" 2>>/dev/null || usermod -u $XUID -g "$XGROUP" "$XUSER" 2>>/dev/null )
+    then
+      XUSER="#$XUID"
+    fi
+  fi
+fi
+# Hook to allow pre-installed software
+if [ -d /opt/eclipse.home -a ! -d "$HOME/.eclipse" ]
+then
+  sudo -u "$XUSER" -g "$XGROUP" cp -r /opt/eclipse.home "$HOME/.eclipse"
+fi 
+exec sudo -u "$XUSER" -g "$XGROUP" /usr/bin/eclipse "$@"
+
