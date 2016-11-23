@@ -1,4 +1,4 @@
-FROM fedora:24
+FROM fedora:25
 MAINTAINER Bill C Riemers https://github.com/docbill
 
 RUN dnf -y update && dnf -y install eclipse git eclipse-egit maven sudo PackageKit-gtk3-module libcanberra-gtk2 firefox tar bzip2 && dnf clean all
