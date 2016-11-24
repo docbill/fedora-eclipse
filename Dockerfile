@@ -12,6 +12,7 @@ ADD Dockerfile /Dockerfile
 ADD eclipse-wrapper /usr/bin/eclipse-wrapper
 
 RUN chmod 555 /usr/bin/eclipse-wrapper
+RUN sed -i -e 's,-Xmx2048m,-Xmx4096m,g' /etc/eclipse.ini
 
 VOLUME /workspace
 WORKDIR /workspace
