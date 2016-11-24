@@ -1,7 +1,11 @@
 FROM fedora:25
 MAINTAINER Bill C Riemers https://github.com/docbill
 
-RUN dnf -y update && dnf -y install eclipse git eclipse-egit maven sudo PackageKit-gtk3-module libcanberra-gtk2 firefox tar bzip2 && dnf clean all
+RUN dnf -y update && dnf clean all
+RUN dnf -y install eclipse eclipse-egit && dnf clean all
+RUN dnf -y install sudo tar bzip2 maven && dnf clean all
+RUN dnf -y install PackageKit-gtk3-module libcanberra-gtk2 && dnf clean all
+RUN dnf -y install firefox && dnf clean all
 
 # Add the dockerfile to make rebuilds from the image easier
 ADD Dockerfile /Dockerfile

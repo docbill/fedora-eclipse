@@ -58,14 +58,28 @@ fi
 if [ -d /opt/eclipse.home ]
 then
   ( cd /opt/eclipse.home
-    for i in *.tar.bz2
+    for prefix in . ".eclipse/"
     do
-      if [ ! -d "$HOME/.${i%.tar.bz2}" -a -r "$i" ]
-      then
-        ( cd "$HOME" && tar xf "/opt/eclipse.home/$i" && chown -R  "$XUSER"."$XGROUP" ".${i%.tar.bz2}" )
-      fi
+      d="$HOME/${prefix}"
+      [ -d "$d" ] || (mkdir -p "$d" && chown "$XUSER"."$XGROUP" "$d")
+      for i in "${prefix#.}"*.tar.bz2
+      do
+        p="$HOME/.${i%.tar.bz2}"
+        if [ ! -d "$p" -a -r "$i" ]
+        then
+          ( cd "$d" && tar xfj "/opt/eclipse.home/$i" && chown -R  "$XUSER"."$XGROUP" "$p" )
+        fi
+      done
+      for i in "${prefix#.}"*.tar.gz.01
+      do
+        p="$HOME/.${i%.tar.gz.01}"
+        if [ ! -d "$p" -a -r "$i" ]
+        then
+          cat "${i%01}"??|( cd "$d" && tar xfz - && chown -R  "$XUSER"."$XGROUP" "$p" )
+        fi
+      done
     done
   )
-fi 
+fi
 exec sudo -u "$XUSER" -g "$XGROUP" /usr/bin/eclipse "$@"
 
