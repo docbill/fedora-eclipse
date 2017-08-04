@@ -4,6 +4,19 @@ then
   /opt/eclipse/eclipse "$@"
   exit $?
 fi
+  
+if [ -z "$LAUNCHER_INI" ]
+then
+    LAUNCHER_INI="--launcher.ini /etc/eclipse.ini"
+fi
+for i in "$@"
+do
+    if [ "x$i" = "x--launcher.ini" ]
+    then
+        LAUNCHER_INI=
+    fi
+done
+
 if [ -z "$HOME" -o "$HOME" = "/root" ]
 then
   if [ -z "$WORKSPACE" ]
@@ -81,5 +94,5 @@ then
     done
   )
 fi
-exec sudo -u "$XUSER" -g "$XGROUP" /usr/bin/eclipse "$@"
+exec sudo -u "$XUSER" -g "$XGROUP" /usr/bin/eclipse $LAUNCHER_INI "$@"
 
