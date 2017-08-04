@@ -1,4 +1,4 @@
-FROM fedora:25
+FROM fedora:26
 MAINTAINER Bill C Riemers https://github.com/docbill
 
 RUN dnf -y update && dnf clean all
@@ -12,7 +12,7 @@ ADD Dockerfile /Dockerfile
 ADD eclipse-wrapper /usr/bin/eclipse-wrapper
 
 RUN chmod 555 /usr/bin/eclipse-wrapper
-RUN sed -i -e 's,-Xmx2048m,-Xmx4096m,g' /etc/eclipse.ini
+RUN sed -i -e 's,-Xmx[0-9]*m,-Xmx4096m,g' /etc/eclipse.ini
 
 VOLUME /workspace
 WORKDIR /workspace
