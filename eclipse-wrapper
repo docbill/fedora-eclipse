@@ -5,7 +5,7 @@ then
   exit $?
 fi
   
-if [ -z "$LAUNCHER_INI" ]
+if [ -z "$LAUNCHER_INI" -a -r /etc/eclipse.ini ]
 then
     LAUNCHER_INI="--launcher.ini /etc/eclipse.ini"
 fi

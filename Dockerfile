@@ -1,4 +1,4 @@
-FROM fedora:26
+FROM fedora:25
 MAINTAINER Bill C Riemers https://github.com/docbill
 
 RUN dnf -y update && dnf clean all
